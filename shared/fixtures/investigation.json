@@ -1,0 +1,51 @@
+{
+  "alert_id": "alert_hero_001",
+  "device_id": "192.168.1.23",
+  "summary": "Behavioral anomaly observed on Student-Laptop (192.168.1.23) starting at 03:17 AM.",
+  "observed_evidence": [
+    "Outbound traffic escalated to 2.1 MB (8.2x higher than baseline 25 KB)",
+    "47 unique destination IPs contacted vs 5 expected",
+    "340 connection attempts failed (potential port scan or unreachable remote infrastructure)",
+    "Activity observed at 03:17 AM (normal active hours: 08:00-22:00)"
+  ],
+  "possible_explanations": [
+    "Internal host performing automated network reconnaissance or port scanning",
+    "Data staging or unauthorized upload attempt via non-standard ports",
+    "Malware trying to contact unavailable C2 nodes causing high connection failure rate",
+    "Legitimate scheduled backup, automated script, or misconfigured application"
+  ],
+  "check_first": [
+    {
+      "priority": 1,
+      "action": "Review DNS query logs for the host around 03:17 AM",
+      "reason": "Identify if destination IPs correlate with newly registered domain queries or DGA patterns."
+    },
+    {
+      "priority": 2,
+      "action": "Inspect outbound connection sockets and remote ports",
+      "reason": "Determine whether traffic targeted external IPs or attempted lateral movement within the subnet."
+    },
+    {
+      "priority": 3,
+      "action": "Check running processes and scheduled tasks on the workstation",
+      "reason": "Pinpoint the executable or script initiating network traffic during non-business hours."
+    },
+    {
+      "priority": 4,
+      "action": "Verify user authentication and physical device presence",
+      "reason": "Confirm whether the student or user was actively using the device at 03:17 AM or if credentials were breached."
+    },
+    {
+      "priority": 5,
+      "action": "Evaluate network isolation if anomalous outbound volume persists",
+      "reason": "Prevent further data exfiltration or lateral spreading while the system is inspected."
+    }
+  ],
+  "next_steps": [
+    "If destination IPs are confirmed malicious, quarantine host from the network",
+    "Inspect local security event logs (Windows Event Logs or macOS syslog) for process creation at 03:17 AM",
+    "Check whether other internal workstations received inbound connections from 192.168.1.23"
+  ],
+  "confidence": "HIGH",
+  "generated_by": "deterministic_fallback"
+}

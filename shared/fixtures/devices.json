@@ -1,0 +1,32 @@
+[
+  {
+    "id": "192.168.1.23",
+    "name": "Student-Laptop",
+    "type": "Workstation",
+    "ip": "192.168.1.23",
+    "mac": "00:1B:44:11:3A:B7",
+    "status": "critical",
+    "risk_score": 94.0,
+    "last_seen": "2026-10-24T03:18:00Z"
+  },
+  {
+    "id": "192.168.1.10",
+    "name": "Admin-Workstation",
+    "type": "Workstation",
+    "ip": "192.168.1.10",
+    "mac": "00:1B:44:AB:CD:EF",
+    "status": "healthy",
+    "risk_score": 0.0,
+    "last_seen": "2026-10-24T14:30:00Z"
+  },
+  {
+    "id": "192.168.1.11",
+    "name": "Developer-MacBook",
+    "type": "Laptop",
+    "ip": "192.168.1.11",
+    "mac": "00:1B:44:12:34:56",
+    "status": "healthy",
+    "risk_score": 0.0,
+    "last_seen": "2026-10-24T15:00:00Z"
+  }
+]

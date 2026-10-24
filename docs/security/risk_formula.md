@@ -66,3 +66,11 @@ If the hero scenario's numbers change, the score will move; re-check this table 
 ## Language policy
 
 Signal explanations and `primary_reason` use hedged phrasing ("above baseline", "could indicate", "significant deviation") and never assert compromise.
+
+## Signal Evidence Ranking (`top_signals`)
+
+To ensure primary investigation interfaces and alert summaries display the most critical telemetry deviations first, signals are ranked using a multi-tier sort:
+1. **Severity Rank**: `CRITICAL` > `HIGH` > `MEDIUM` > `LOW`
+2. **Deviation Factor**: Sorted in descending order for ties within the same severity level.
+
+By default, `top_signals(signals, n=4)` caps hero evidence to the top 4 most impactful signals.

@@ -3,7 +3,7 @@
   "device_id": "192.168.1.23",
   "summary": "Behavioral anomaly observed on Student-Laptop (192.168.1.23) starting at 03:17 AM.",
   "observed_evidence": [
-    "Outbound traffic escalated to 2.1 MB (8.2x higher than baseline 25 KB)",
+    "Outbound traffic escalated to 2.1 MB (86.0x higher than baseline 25 KB)",
     "47 unique destination IPs contacted vs 5 expected",
     "340 connection attempts failed (potential port scan or unreachable remote infrastructure)",
     "Activity observed at 03:17 AM (normal active hours: 08:00-22:00)"

@@ -73,7 +73,7 @@ The platform supports a 100% deterministic, zero-fail demo sequence:
 3. **Scene 3 (Instant Detection):** 
    - The ML rule engine evaluates the hero anomaly window for `Student-Laptop` (`192.168.1.23`) at `03:17 AM`.
    - Computes risk score **94 / CRITICAL**.
-   - Outbound traffic: 2.1 MB (8.2x baseline of 25 KB).
+   - Outbound traffic: 2.1 MB (86.0x baseline of 25 KB).
    - Failed connections: 340 (170x baseline of 2).
    - Unique destinations: 47 (9.4x baseline of 5).
    - Off-hours activity (outside 08:00–22:00 window).

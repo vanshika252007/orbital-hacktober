@@ -1,0 +1,68 @@
+[
+  {
+    "timestamp": "2026-10-23T22:00:00Z",
+    "bytes_sent": 24100.0,
+    "bytes_received": 105200.0,
+    "connections": 30,
+    "failed_connections": 1,
+    "unique_destinations": 5,
+    "dns_requests": 16,
+    "risk_score": 0.0,
+    "is_anomaly": false
+  },
+  {
+    "timestamp": "2026-10-23T23:00:00Z",
+    "bytes_sent": 1200.0,
+    "bytes_received": 4500.0,
+    "connections": 2,
+    "failed_connections": 0,
+    "unique_destinations": 1,
+    "dns_requests": 2,
+    "risk_score": 0.0,
+    "is_anomaly": false
+  },
+  {
+    "timestamp": "2026-10-24T00:00:00Z",
+    "bytes_sent": 800.0,
+    "bytes_received": 2100.0,
+    "connections": 1,
+    "failed_connections": 0,
+    "unique_destinations": 1,
+    "dns_requests": 1,
+    "risk_score": 0.0,
+    "is_anomaly": false
+  },
+  {
+    "timestamp": "2026-10-24T01:00:00Z",
+    "bytes_sent": 600.0,
+    "bytes_received": 1800.0,
+    "connections": 1,
+    "failed_connections": 0,
+    "unique_destinations": 1,
+    "dns_requests": 1,
+    "risk_score": 0.0,
+    "is_anomaly": false
+  },
+  {
+    "timestamp": "2026-10-24T02:00:00Z",
+    "bytes_sent": 950.0,
+    "bytes_received": 2400.0,
+    "connections": 1,
+    "failed_connections": 0,
+    "unique_destinations": 1,
+    "dns_requests": 1,
+    "risk_score": 0.0,
+    "is_anomaly": false
+  },
+  {
+    "timestamp": "2026-10-24T03:17:00Z",
+    "bytes_sent": 2202010.0,
+    "bytes_received": 451000.0,
+    "connections": 430,
+    "failed_connections": 340,
+    "unique_destinations": 47,
+    "dns_requests": 88,
+    "risk_score": 94.0,
+    "is_anomaly": true
+  }
+]

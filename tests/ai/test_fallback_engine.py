@@ -12,7 +12,8 @@ class TestFallbackEngine(unittest.TestCase):
             "signals": [
                 {
                     "type": "traffic_spike",
-                    "explanation": "Outbound traffic is 8.2x above baseline.",
+                    "deviation_factor": 86.0,
+                    "explanation": "Outbound traffic exceeds baseline.",
                 },
                 {
                     "type": "failed_connection_burst",
@@ -31,7 +32,7 @@ class TestFallbackEngine(unittest.TestCase):
         self.assertEqual(result["device_id"], "192.168.1.23")
         self.assertEqual(result["generated_by"], "deterministic_fallback")
         self.assertIn(
-            "Outbound traffic is 8.2x above baseline.",
+            "Outbound traffic is 86.0x above baseline.",
             result["observed_evidence"],
         )
         self.assertTrue(result["check_first"])

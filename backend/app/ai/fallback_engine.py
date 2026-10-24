@@ -82,9 +82,20 @@ def generate_fallback_investigation(
             continue
 
         signal_type = signal.get("type", "unknown")
-        evidence.append(
-            str(signal.get("explanation") or f"Signal observed: {signal_type}.")
-        )
+        deviation_factor = signal.get("deviation_factor")
+
+        if (
+            signal_type == "traffic_spike"
+            and isinstance(deviation_factor, (int, float))
+            and not isinstance(deviation_factor, bool)
+        ):
+            evidence.append(
+                f"Outbound traffic is {float(deviation_factor):.1f}x above baseline."
+            )
+        else:
+            evidence.append(
+                str(signal.get("explanation") or f"Signal observed: {signal_type}.")
+            )
         explanations.append(
             explanation_map.get(
                 signal_type,

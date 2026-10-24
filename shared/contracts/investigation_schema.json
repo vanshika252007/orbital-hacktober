@@ -1,0 +1,29 @@
+{
+  "alert_id": "alert_001",
+  "device_id": "192.168.1.23",
+  "summary": "Device Student-Laptop exhibits suspicious network behaviors starting at 03:17 AM.",
+  "observed_evidence": [
+    "Outbound traffic escalated to 2.1 MB (8.2x higher than baseline 25 KB)",
+    "47 unique destination IPs contacted vs 5 expected",
+    "340 connection attempts failed (potential port scan or dead C2 infrastructure)",
+    "Activity observed at 03:17 AM (normal active hours: 08:00-22:00)"
+  ],
+  "possible_explanations": [
+    "Internal host performing automated network reconnaissance/scanning",
+    "Data staging or exfiltration attempt via non-standard ports",
+    "Malware trying to contact unavailable C2 nodes causing failed connections"
+  ],
+  "check_first": [
+    {"priority": 1, "action": "Review DNS requests", "reason": "Identify if destination IPs correlate with newly registered domain queries or DGA patterns."},
+    {"priority": 2, "action": "Inspect outbound connections", "reason": "Identify active network sockets and target destination ports."},
+    {"priority": 3, "action": "Check running processes on host", "reason": "Pinpoint local executable responsible for background traffic at 03:17 AM."},
+    {"priority": 4, "action": "Verify device ownership and location", "reason": "Confirm if Student-Laptop was physically active or remotely accessed at night."},
+    {"priority": 5, "action": "Consider network isolation if traffic continues", "reason": "Prevent potential data staging or lateral movement while investigating."}
+  ],
+  "next_steps": [
+    "Isolate host if outbound data volume increases further",
+    "Check EDR / system logs for process creation events at 03:17 AM"
+  ],
+  "confidence": "medium",
+  "generated_by": "deterministic_fallback"
+}

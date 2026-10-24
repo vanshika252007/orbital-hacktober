@@ -1,0 +1,7 @@
+{
+  "total_devices": 42,
+  "active_anomalies": 1,
+  "critical_count": 1,
+  "total_events": 7057,
+  "network_health": "CRITICAL"
+}

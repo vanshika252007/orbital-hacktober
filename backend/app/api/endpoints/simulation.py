@@ -22,7 +22,7 @@ def start_simulation(db: Session = Depends(get_db)):
 
     This triggers the 30-second presentation scenario described in Section 6:
     - Generates risk score 94 / CRITICAL alert
-    - Sets device live metrics to the anomalous values (8.2x traffic, 430 connections, etc.)
+    - Sets device live metrics to the anomalous values (86.0x traffic, 430 connections, etc.)
     - Pre-generates investigation guidance
     - Dashboard transitions from HEALTHY → CRITICAL
 

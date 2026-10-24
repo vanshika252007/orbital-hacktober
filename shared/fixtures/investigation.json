@@ -3,10 +3,10 @@
   "device_id": "192.168.1.23",
   "summary": "Behavioral anomaly observed on Student-Laptop (192.168.1.23) starting at 03:17 AM.",
   "observed_evidence": [
-    "Outbound traffic escalated to 2.1 MB (8.2x higher than baseline 25 KB)",
-    "47 unique destination IPs contacted vs 5 expected",
-    "340 connection attempts failed (potential port scan or unreachable remote infrastructure)",
-    "Activity observed at 03:17 AM (normal active hours: 08:00-22:00)"
+    "340 failed connection attempts vs 2 normal (170.0x baseline); could indicate scanning or unreachable remote hosts",
+    "Outbound traffic is 86.0x above baseline (2.1 MB vs 25 KB normal)",
+    "Contacted 47 unique destinations vs 5 normal (9.4x baseline)",
+    "Activity at 03:17 is outside this device's normal active hours (08:00-22:00)"
   ],
   "possible_explanations": [
     "Internal host performing automated network reconnaissance or port scanning",
@@ -17,22 +17,22 @@
   "check_first": [
     {
       "priority": 1,
-      "action": "Review DNS query logs for the host around 03:17 AM",
+      "action": "Review DNS requests",
       "reason": "Identify if destination IPs correlate with newly registered domain queries or DGA patterns."
     },
     {
       "priority": 2,
-      "action": "Inspect outbound connection sockets and remote ports",
+      "action": "Inspect outbound connections",
       "reason": "Determine whether traffic targeted external IPs or attempted lateral movement within the subnet."
     },
     {
       "priority": 3,
-      "action": "Check running processes and scheduled tasks on the workstation",
+      "action": "Check running processes on host",
       "reason": "Pinpoint the executable or script initiating network traffic during non-business hours."
     },
     {
       "priority": 4,
-      "action": "Verify user authentication and physical device presence",
+      "action": "Verify device ownership",
       "reason": "Confirm whether the student or user was actively using the device at 03:17 AM or if credentials were breached."
     },
     {
@@ -46,6 +46,6 @@
     "Inspect local security event logs (Windows Event Logs or macOS syslog) for process creation at 03:17 AM",
     "Check whether other internal workstations received inbound connections from 192.168.1.23"
   ],
-  "confidence": "HIGH",
+  "confidence": "high",
   "generated_by": "deterministic_fallback"
 }

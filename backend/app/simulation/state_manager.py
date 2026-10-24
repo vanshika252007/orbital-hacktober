@@ -84,8 +84,8 @@ HERO_SIGNALS = [
         "severity": "HIGH",
         "measured_value": 2202010,
         "baseline_value": 25600,
-        "deviation_factor": 8.2,
-        "explanation": "Outbound traffic is 8.2x above baseline (2.1 MB vs 25 KB normal)",
+        "deviation_factor": 86.0,
+        "explanation": "Outbound traffic is 86.0x above baseline (2.1 MB vs 25 KB normal)",
     },
     {
         "type": "failed_connection_burst",
@@ -116,7 +116,7 @@ HERO_SIGNALS = [
 HERO_RISK_SCORE = 94.0
 HERO_SEVERITY = "CRITICAL"
 HERO_PRIMARY_REASON = (
-    "Extreme outbound traffic spike (8.2x), 340 failed connections (170x), "
+    "Extreme outbound traffic spike (86.0x), 340 failed connections (170x), "
     "47 unique destinations (9.4x), and activity at 03:17 AM outside normal hours"
 )
 HERO_CURRENT_METRICS = {
@@ -363,10 +363,15 @@ def _generate_and_cache_investigation(
             pass
 
     # Fallback: produce a static investigation from the hero signals
-    _save_static_investigation(db, alert_id, device_id)
+    _save_static_investigation(db, alert_id, device_id, signals)
 
 
-def _save_static_investigation(db: Session, alert_id: str, device_id: str) -> None:
+def _save_static_investigation(
+    db: Session,
+    alert_id: str,
+    device_id: str,
+    signals: list,
+) -> None:
     static = {
         "summary": (
             "Device Student-Laptop exhibits suspicious network behaviors starting at 03:17 AM. "
@@ -374,10 +379,11 @@ def _save_static_investigation(db: Session, alert_id: str, device_id: str) -> No
             "and contact with a large number of previously unseen destinations."
         ),
         "observed_evidence": [
-            "Outbound traffic escalated to 2.1 MB (8.2x higher than baseline 25 KB)",
-            "47 unique destination IPs contacted vs 5 expected",
-            "340 connection attempts failed (potential port scan or dead C2 infrastructure)",
-            "Activity observed at 03:17 AM (normal active hours: 08:00-22:00)",
+            signal["explanation"]
+            for signal in signals
+            if isinstance(signal, dict) and signal.get("explanation")
+        ] or [
+            "No detailed anomaly signals were provided; inspect the underlying telemetry."
         ],
         "possible_explanations": [
             "Internal host performing automated network reconnaissance/scanning",
@@ -388,7 +394,7 @@ def _save_static_investigation(db: Session, alert_id: str, device_id: str) -> No
             {"priority": 1, "action": "Review DNS requests", "reason": "Identify if destination IPs correlate with newly registered domain queries or DGA patterns."},
             {"priority": 2, "action": "Inspect outbound connections", "reason": "Identify active network sockets and target destination ports."},
             {"priority": 3, "action": "Check running processes on host", "reason": "Pinpoint local executable responsible for background traffic at 03:17 AM."},
-            {"priority": 4, "action": "Verify device ownership and location", "reason": "Confirm if Student-Laptop was physically active or remotely accessed at night."},
+            {"priority": 4, "action": "Verify device ownership", "reason": "Confirm if Student-Laptop was physically active or remotely accessed at night."},
             {"priority": 5, "action": "Consider network isolation if traffic continues", "reason": "Prevent potential data staging or lateral movement while investigating."},
         ],
         "next_steps": [

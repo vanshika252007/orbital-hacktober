@@ -7,7 +7,7 @@
     "severity": "CRITICAL",
     "status": "OPEN",
     "detected_at": "2026-10-24T03:17:00Z",
-    "primary_reason": "Outbound traffic 8.2x baseline, 340 failed connection attempts, 47 unique destinations at 03:17 AM (outside normal 08:00-22:00 window)",
+    "primary_reason": "Outbound traffic 86.0x baseline, 340 failed connection attempts, 47 unique destinations at 03:17 AM (outside normal 08:00-22:00 window)",
     "signals_count": 4,
     "signals": [
       {
@@ -15,8 +15,8 @@
         "severity": "HIGH",
         "measured_value": 2202010.0,
         "baseline_value": 25600.0,
-        "deviation_factor": 8.2,
-        "explanation": "Outbound traffic is 8.2x above baseline (2.1 MB vs 25 KB normal)"
+        "deviation_factor": 86.0,
+        "explanation": "Outbound traffic is 86.0x above baseline (2.1 MB vs 25 KB normal)"
       },
       {
         "type": "failed_connection_burst",

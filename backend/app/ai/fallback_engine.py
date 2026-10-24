@@ -56,8 +56,8 @@ def generate_fallback_investigation(
 
     evidence: List[str] = []
     explanations: List[str] = []
-    actions: List[Dict[str, str]] = []
-    seen_actions = set()
+    signal_actions: List[Dict[str, str]] = []
+    signal_actions_by_name: Dict[str, Dict[str, str]] = {}
 
     explanation_map = {
         "traffic_spike": (
@@ -80,26 +80,27 @@ def generate_fallback_investigation(
         ),
     }
 
-    # Add safe defaults for optional ranking fields required by top_signals().
+    # Add ranking defaults to copies because top_signals() requires both fields.
     rankable_signals = [
-        {
-            **signal,
-            "severity": signal.get("severity", "LOW"),
-            "deviation_factor": signal.get("deviation_factor", 1.0),
-        }
+        dict(signal)
         for signal in signals
         if isinstance(signal, dict)
     ]
 
+    for signal in rankable_signals:
+        if signal.get("severity") is None:
+            signal["severity"] = "LOW"
+        if signal.get("deviation_factor") is None:
+            signal["deviation_factor"] = 1.0
+
     for signal in top_signals(rankable_signals, 4):
         signal_type = signal.get("type", "unknown")
 
-        # Preserve the explanation supplied by the signal generator.
+        explanation = signal.get("explanation")
         evidence.append(
-            str(
-                signal.get("explanation")
-                or f"Signal observed: {signal_type}."
-            )
+            str(explanation)
+            if explanation is not None
+            else f"Signal observed: {signal_type}."
         )
 
         explanations.append(
@@ -112,9 +113,10 @@ def generate_fallback_investigation(
         guidance = SIGNAL_GUIDANCE.get(signal_type)
         if guidance:
             action, reason = guidance
-            if action not in seen_actions:
-                actions.append({"action": action, "reason": reason})
-                seen_actions.add(action)
+            if action not in signal_actions_by_name:
+                action_item = {"action": action, "reason": reason}
+                signal_actions.append(action_item)
+                signal_actions_by_name[action] = action_item
 
     if not evidence:
         evidence.append(
@@ -149,14 +151,6 @@ def generate_fallback_investigation(
         ),
     ]
 
-    for action, reason in defaults:
-        if len(actions) >= 5:
-            break
-        if action not in seen_actions:
-            actions.append({"action": action, "reason": reason})
-            seen_actions.add(action)
-
-    # Keep the four required actions first, in demo order.
     priority_actions = [
         "Review DNS requests",
         "Inspect outbound connections",
@@ -164,20 +158,25 @@ def generate_fallback_investigation(
         "Verify device ownership",
     ]
 
-    actions_by_name = {
-        item["action"]: item
-        for item in actions
+    defaults_by_name = {
+        action: {"action": action, "reason": reason}
+        for action, reason in defaults
     }
 
-    ordered_actions = []
+    ordered_actions = [
+        signal_actions_by_name.get(action, defaults_by_name[action])
+        for action in priority_actions
+    ]
 
-    for action in priority_actions:
-        if action in actions_by_name:
-            ordered_actions.append(actions_by_name[action])
-
-    for item in actions:
-        if item["action"] not in priority_actions:
-            ordered_actions.append(item)
+    fifth_action = next(
+        (
+            item
+            for item in signal_actions
+            if item["action"] not in priority_actions
+        ),
+        defaults_by_name["Consider network isolation if risk persists"],
+    )
+    ordered_actions.append(fifth_action)
 
     check_first = [
         {

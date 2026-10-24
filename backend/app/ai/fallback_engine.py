@@ -1,30 +1,33 @@
+
 from typing import Any, Dict, List, Optional
+
+from backend.app.ml.risk_engine import top_signals
 
 
 SIGNAL_GUIDANCE = {
     "traffic_spike": (
         "Inspect outbound connections",
-        "Identify unusual destination IPs, ports, and outbound traffic."
+        "Identify unusual destination IPs, ports, and outbound traffic.",
     ),
     "failed_connection_burst": (
         "Review failed connection logs",
-        "Check repeated failures, unusual ports, and possible scanning behavior."
+        "Check repeated failures, unusual ports, and possible scanning behavior.",
     ),
     "destination_explosion": (
         "Inspect contacted destinations",
-        "Identify newly contacted or unexpected external destinations."
+        "Identify newly contacted or unexpected external destinations.",
     ),
     "connection_burst": (
         "Inspect active connections",
-        "Review unusual connection counts, destination ports, and remote hosts."
+        "Review unusual connection counts, destination ports, and remote hosts.",
     ),
     "unusual_hours": (
         "Verify device activity",
-        "Confirm whether activity at this time was expected."
+        "Confirm whether activity at this time was expected.",
     ),
     "new_external_destination": (
         "Investigate new external destinations",
-        "Verify the destination and whether the connection was expected."
+        "Verify the destination and whether the connection was expected.",
     ),
 }
 
@@ -77,25 +80,28 @@ def generate_fallback_investigation(
         ),
     }
 
-    for signal in signals:
-        if not isinstance(signal, dict):
-            continue
+    # Add safe defaults for optional ranking fields required by top_signals().
+    rankable_signals = [
+        {
+            **signal,
+            "severity": signal.get("severity", "LOW"),
+            "deviation_factor": signal.get("deviation_factor", 1.0),
+        }
+        for signal in signals
+        if isinstance(signal, dict)
+    ]
 
+    for signal in top_signals(rankable_signals, 4):
         signal_type = signal.get("type", "unknown")
-        deviation_factor = signal.get("deviation_factor")
 
-        if (
-            signal_type == "traffic_spike"
-            and isinstance(deviation_factor, (int, float))
-            and not isinstance(deviation_factor, bool)
-        ):
-            evidence.append(
-                f"Outbound traffic is {float(deviation_factor):.1f}x above baseline."
+        # Preserve the explanation supplied by the signal generator.
+        evidence.append(
+            str(
+                signal.get("explanation")
+                or f"Signal observed: {signal_type}."
             )
-        else:
-            evidence.append(
-                str(signal.get("explanation") or f"Signal observed: {signal_type}.")
-            )
+        )
+
         explanations.append(
             explanation_map.get(
                 signal_type,
@@ -150,13 +156,36 @@ def generate_fallback_investigation(
             actions.append({"action": action, "reason": reason})
             seen_actions.add(action)
 
+    # Keep the four required actions first, in demo order.
+    priority_actions = [
+        "Review DNS requests",
+        "Inspect outbound connections",
+        "Check running processes on host",
+        "Verify device ownership",
+    ]
+
+    actions_by_name = {
+        item["action"]: item
+        for item in actions
+    }
+
+    ordered_actions = []
+
+    for action in priority_actions:
+        if action in actions_by_name:
+            ordered_actions.append(actions_by_name[action])
+
+    for item in actions:
+        if item["action"] not in priority_actions:
+            ordered_actions.append(item)
+
     check_first = [
         {
             "priority": index,
             "action": item["action"],
             "reason": item["reason"],
         }
-        for index, item in enumerate(actions[:5], start=1)
+        for index, item in enumerate(ordered_actions[:5], start=1)
     ]
 
     return {

@@ -32,7 +32,7 @@ class TestFallbackEngine(unittest.TestCase):
         self.assertEqual(result["device_id"], "192.168.1.23")
         self.assertEqual(result["generated_by"], "deterministic_fallback")
         self.assertIn(
-            "Outbound traffic is 86.0x above baseline.",
+            "Outbound traffic exceeds baseline.",
             result["observed_evidence"],
         )
         self.assertTrue(result["check_first"])

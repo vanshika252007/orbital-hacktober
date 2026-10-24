@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { FloatingNav } from './components/layout/FloatingNav';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { NetworkOverview } from './components/dashboard/NetworkOverview';
@@ -208,9 +209,10 @@ export default function App() {
 
   const { title, breadcrumb } = getPageMeta();
   const criticalCount = alerts.filter((a) => a.severity === 'CRITICAL').length;
+  const isOverview = activePage === 'overview';
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--bg-app)' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-app)' }}>
       
       {/* Toast Notification */}
       {toast && (
@@ -220,131 +222,166 @@ export default function App() {
             bottom: '24px',
             right: '24px',
             zIndex: 9999,
-            padding: '0.85rem 1.25rem',
-            borderRadius: '10px',
-            backgroundColor: toast.type === 'critical' ? '#FF657A' : (toast.type === 'healthy' ? '#42D6A0' : '#17211C'),
-            color: toast.type === 'healthy' ? '#080B0D' : '#FFFFFF',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
+            padding: '0.75rem 1.1rem',
+            borderRadius: '12px',
+            backgroundColor: toast.type === 'critical' ? 'rgba(255, 113, 132, 0.95)' : (toast.type === 'healthy' ? 'rgba(66, 214, 160, 0.95)' : '#17211C'),
+            color: toast.type === 'healthy' ? '#050706' : '#FFFFFF',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
             boxShadow: '0 8px 30px rgba(0,0,0,0.7)',
-            fontSize: '0.84rem',
+            fontSize: '0.8rem',
             fontWeight: 600,
             display: 'flex',
             alignItems: 'center',
-            gap: '0.65rem',
+            gap: '0.55rem',
             animation: 'fadeIn 0.2s ease',
+            maxWidth: '480px',
           }}
         >
-          {toast.type === 'critical' ? <AlertOctagon size={18} /> : (toast.type === 'healthy' ? <CheckCircle2 size={18} /> : <Info size={18} />)}
+          {toast.type === 'critical' ? <AlertOctagon size={16} /> : (toast.type === 'healthy' ? <CheckCircle2 size={16} /> : <Info size={16} />)}
           <span>{toast.message}</span>
         </div>
       )}
 
-      {/* Left Application Sidebar */}
-      <Sidebar
-        activePage={activePage}
-        onNavigate={(page) => setActivePage(page)}
-        collapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-        criticalAlertCount={criticalCount}
-        isBackendOnline={isBackendOnline}
-      />
+      {/* OVERVIEW: Floating nav + full-bleed content */}
+      {isOverview && (
+        <>
+          <FloatingNav
+            activePage={activePage}
+            onNavigate={setActivePage}
+            isSimulationActive={isSimulationActive}
+            isBackendOnline={isBackendOnline}
+            criticalAlertCount={criticalCount}
+            onStartSimulation={handleStartSimulation}
+            onResetSimulation={handleResetSimulation}
+            onRefresh={() => refreshData(true)}
+            isRefreshing={isRefreshing}
+            loadingAction={loadingAction}
+          />
 
-      {/* Main Content Area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        
-        {/* Sticky Top Header */}
-        <Header
-          activePage={activePage}
-          pageTitle={title}
-          breadcrumb={breadcrumb}
-          isSimulationActive={isSimulationActive}
-          isBackendOnline={isBackendOnline}
-          onStartSimulation={handleStartSimulation}
-          onResetSimulation={handleResetSimulation}
-          onQuickInvestigate={() => handleOpenInvestigation('alert_hero_001')}
-          onRefresh={() => refreshData(true)}
-          isRefreshing={isRefreshing}
-          loadingAction={loadingAction}
-          hasActiveAlert={alerts.length > 0}
-        />
+          <NetworkOverview
+            stats={stats}
+            devices={devices}
+            alerts={alerts}
+            timeline={timeline}
+            isSimulationActive={isSimulationActive}
+            onSelectDevice={handleSelectDevice}
+            onOpenInvestigation={handleOpenInvestigation}
+            onStartSimulation={handleStartSimulation}
+            onResetSimulation={handleResetSimulation}
+            onNavigateDevices={() => setActivePage('devices')}
+            loadingAction={loadingAction}
+          />
 
-        {/* Page Content View */}
-        <main style={{ flex: 1, padding: '2rem', maxWidth: '1440px', width: '100%', margin: '0 auto' }}>
-          {activePage === 'overview' && (
-            <NetworkOverview
-              stats={stats}
-              devices={devices}
-              alerts={alerts}
-              timeline={timeline}
+          {/* Minimal Footer */}
+          <footer
+            style={{
+              padding: '1.5rem 2rem',
+              borderTop: '1px solid var(--border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: '0.7rem',
+              color: 'var(--text-dim)',
+              flexWrap: 'wrap',
+              gap: '0.75rem',
+            }}
+          >
+            <div>Network Anomaly Spotter &bull; Hacktober Team Edition &bull; Teammate 3 (Frontend UI)</div>
+            <div style={{ display: 'flex', gap: '1.25rem' }}>
+              <span>Detect the deviation</span>
+              <span>Explain the evidence</span>
+              <span>Prioritize the investigation</span>
+            </div>
+          </footer>
+        </>
+      )}
+
+      {/* NON-OVERVIEW PAGES: Sidebar + Header layout */}
+      {!isOverview && (
+        <div style={{ display: 'flex', minHeight: '100vh' }}>
+          <Sidebar
+            activePage={activePage}
+            onNavigate={(page) => setActivePage(page)}
+            collapsed={sidebarCollapsed}
+            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+            criticalAlertCount={criticalCount}
+            isBackendOnline={isBackendOnline}
+          />
+
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            <Header
+              activePage={activePage}
+              pageTitle={title}
+              breadcrumb={breadcrumb}
               isSimulationActive={isSimulationActive}
-              onSelectDevice={handleSelectDevice}
-              onOpenInvestigation={handleOpenInvestigation}
+              isBackendOnline={isBackendOnline}
               onStartSimulation={handleStartSimulation}
               onResetSimulation={handleResetSimulation}
+              onQuickInvestigate={() => handleOpenInvestigation('alert_hero_001')}
+              onRefresh={() => refreshData(true)}
+              isRefreshing={isRefreshing}
               loadingAction={loadingAction}
+              hasActiveAlert={alerts.length > 0}
             />
-          )}
 
-          {activePage === 'devices' && (
-            <DevicesPage
-              devices={devices}
-              onSelectDevice={handleSelectDevice}
-            />
-          )}
+            <main style={{ flex: 1, padding: '2rem', maxWidth: '1440px', width: '100%', margin: '0 auto' }}>
+              {activePage === 'devices' && (
+                <DevicesPage
+                  devices={devices}
+                  onSelectDevice={handleSelectDevice}
+                />
+              )}
 
-          {activePage === 'alerts' && (
-            <AlertsPage
-              alerts={alerts}
-              onOpenInvestigation={handleOpenInvestigation}
-              onInspectDevice={handleSelectDevice}
-            />
-          )}
+              {activePage === 'alerts' && (
+                <AlertsPage
+                  alerts={alerts}
+                  onOpenInvestigation={handleOpenInvestigation}
+                  onInspectDevice={handleSelectDevice}
+                />
+              )}
 
-          {activePage === 'device-detail' && selectedDevice && (
-            <DeviceDetailPage
-              device={selectedDevice}
-              timeline={selectedDeviceTimeline}
-              onBack={() => setActivePage('devices')}
-              onOpenInvestigation={handleOpenInvestigation}
-            />
-          )}
+              {activePage === 'device-detail' && selectedDevice && (
+                <DeviceDetailPage
+                  device={selectedDevice}
+                  timeline={selectedDeviceTimeline}
+                  onBack={() => setActivePage('devices')}
+                  onOpenInvestigation={handleOpenInvestigation}
+                />
+              )}
 
-          {activePage === 'investigation' && (
-            <InvestigationWorkspace
-              investigation={investigation}
-              onRegenerate={handleRegenerateInvestigation}
-              isRegenerating={isRegeneratingInv}
-              onNavigateToDevice={handleSelectDevice}
-            />
-          )}
-        </main>
+              {activePage === 'investigation' && (
+                <InvestigationWorkspace
+                  investigation={investigation}
+                  onRegenerate={handleRegenerateInvestigation}
+                  isRegenerating={isRegeneratingInv}
+                  onNavigateToDevice={handleSelectDevice}
+                />
+              )}
+            </main>
 
-        {/* Minimal Footer */}
-        <footer
-          style={{
-            padding: '1.25rem 2rem',
-            borderTop: '1px solid var(--border)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            fontSize: '0.74rem',
-            color: 'var(--text-dim)',
-            flexWrap: 'wrap',
-            gap: '0.75rem',
-          }}
-        >
-          <div>
-            Network Anomaly Spotter &bull; Hacktober Team Edition &bull; Teammate 3 (Frontend UI)
+            <footer
+              style={{
+                padding: '1.25rem 2rem',
+                borderTop: '1px solid var(--border)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: '0.7rem',
+                color: 'var(--text-dim)',
+                flexWrap: 'wrap',
+                gap: '0.75rem',
+              }}
+            >
+              <div>Network Anomaly Spotter &bull; Hacktober Team Edition &bull; Teammate 3 (Frontend UI)</div>
+              <div style={{ display: 'flex', gap: '1.25rem' }}>
+                <span>Detect the deviation</span>
+                <span>Explain the evidence</span>
+                <span>Prioritize the investigation</span>
+              </div>
+            </footer>
           </div>
-          <div style={{ display: 'flex', gap: '1.25rem' }}>
-            <span>Detect the deviation</span>
-            <span>Explain the evidence</span>
-            <span>Prioritize the investigation</span>
-          </div>
-        </footer>
-
-      </div>
-
+        </div>
+      )}
     </div>
   );
 }

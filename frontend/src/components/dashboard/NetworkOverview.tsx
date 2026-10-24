@@ -1,7 +1,6 @@
 import React from 'react';
 import { NetworkStats, DeviceListItem, Alert, TimelineEntry } from '../../types';
-import { MetricCard } from '../common/MetricCard';
-import { NetworkTopology } from './NetworkTopology';
+import { CinematicHero } from './CinematicHero';
 import { ActivityChart } from './ActivityChart';
 import { RiskDistribution } from './RiskDistribution';
 import { PriorityQueue } from './PriorityQueue';
@@ -17,6 +16,7 @@ interface NetworkOverviewProps {
   onOpenInvestigation: (alertId: string) => void;
   onStartSimulation: () => void;
   onResetSimulation: () => void;
+  onNavigateDevices: () => void;
   loadingAction: boolean;
 }
 
@@ -30,184 +30,141 @@ export const NetworkOverview: React.FC<NetworkOverviewProps> = ({
   onOpenInvestigation,
   onStartSimulation,
   onResetSimulation,
+  onNavigateDevices,
   loadingAction,
 }) => {
   const isCritical = stats.network_health === 'CRITICAL' || isSimulationActive;
 
+  const metrics = [
+    {
+      label: 'Total Devices',
+      value: String(stats.total_devices || 42),
+      sub: 'Monitored endpoints',
+      icon: HardDrive,
+      color: 'var(--text-primary)',
+    },
+    {
+      label: 'Active Anomalies',
+      value: String(isSimulationActive ? 1 : (stats.active_anomalies || 0)),
+      sub: isCritical ? 'Threshold deviation' : 'No deviations',
+      icon: AlertTriangle,
+      color: isCritical ? 'var(--status-warning)' : 'var(--status-healthy)',
+    },
+    {
+      label: 'Critical Alerts',
+      value: String(isSimulationActive ? 1 : (stats.critical_count || 0)),
+      sub: isCritical ? 'Student-Laptop (94)' : 'No incidents',
+      icon: ShieldAlert,
+      color: isCritical ? 'var(--status-critical)' : 'var(--status-healthy)',
+    },
+    {
+      label: 'Events Processed',
+      value: (stats.total_events || 7056).toLocaleString(),
+      sub: 'Telemetry records',
+      icon: Cpu,
+      color: 'var(--text-primary)',
+    },
+  ];
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
-      
-      {/* Page Heading & Hero Positioning */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '1.25rem',
-          paddingBottom: '0.5rem',
-        }}
-      >
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.4rem' }}>
-            <span
-              className="badge-pill badge-mint"
-              style={{ fontSize: '0.68rem', letterSpacing: '0.06em' }}
-            >
-              SOC Behavioral Defense
-            </span>
-            <span style={{ fontSize: '0.74rem', color: 'var(--text-dim)' }}>
-              Subnet 192.168.1.0/24 Continuous Telemetry
-            </span>
-          </div>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      {/* Full-viewport Cinematic Hero */}
+      <CinematicHero
+        stats={stats}
+        devices={devices}
+        isSimulationActive={isSimulationActive}
+        onOpenInvestigation={onOpenInvestigation}
+        onNavigateDevices={onNavigateDevices}
+        onSelectDevice={onSelectDevice}
+      />
 
-          <h1
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '2.1rem',
-              fontWeight: 800,
-              letterSpacing: '-0.03em',
-              color: 'var(--text-primary)',
-              lineHeight: 1.15,
-            }}
-          >
-            See what shouldn't be happening.
-          </h1>
+      {/* Transition into dashboard content */}
+      <div className="dashboard-section">
 
-          <p
-            style={{
-              fontSize: '0.92rem',
-              color: 'var(--text-muted)',
-              marginTop: '0.35rem',
-              maxWidth: '620px',
-              lineHeight: 1.5,
-            }}
-          >
-            Monitor device behavior, uncover suspicious deviations, and investigate with evidence.
-          </p>
+        {/* Compact Metrics Row */}
+        <div className="metrics-row">
+          {metrics.map((m, i) => {
+            const Icon = m.icon;
+            return (
+              <div key={i} className="metric-cell">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span className="metric-label">{m.label}</span>
+                  <Icon size={14} color={m.color} style={{ opacity: 0.6 }} />
+                </div>
+                <span className="metric-value" style={{ color: m.color }}>{m.value}</span>
+                <span className="metric-sub">{m.sub}</span>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Demo Scenario Stepper Card */}
+        {/* Demo Lifecycle Toggle (discreet) */}
         <div
-          className="card"
           style={{
-            padding: '0.9rem 1.15rem',
-            backgroundColor: 'var(--bg-elevated)',
             display: 'flex',
             alignItems: 'center',
-            gap: '1.25rem',
+            justifyContent: 'space-between',
+            padding: '0.8rem 1.2rem',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border)',
+            borderRadius: '12px',
+            fontSize: '0.76rem',
           }}
         >
           <div>
-            <div style={{ fontSize: '0.68rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Presentation Lifecycle
-            </div>
-            <div style={{ fontSize: '0.82rem', fontWeight: 600, color: isCritical ? '#FF657A' : '#42D6A0', marginTop: '2px' }}>
-              {isCritical ? 'Scene 3-5: Incident Detection & Guidance' : 'Scene 1: Clean Baseline Monitoring'}
-            </div>
+            <span style={{ color: 'var(--text-muted)', marginRight: '0.5rem' }}>Presentation:</span>
+            <span style={{ color: isCritical ? 'var(--status-critical)' : 'var(--status-healthy)', fontWeight: 600 }}>
+              {isCritical ? 'Incident Detection & Guidance' : 'Clean Baseline Monitoring'}
+            </span>
           </div>
-
           <div>
             {isCritical ? (
               <button
                 onClick={onResetSimulation}
                 disabled={loadingAction}
                 className="pill-button pill-secondary"
-                style={{ fontSize: '0.76rem', padding: '0.4rem 0.85rem' }}
+                style={{ fontSize: '0.72rem', padding: '0.3rem 0.75rem' }}
               >
-                Reset Demo Baseline
+                Reset Baseline
               </button>
             ) : (
               <button
                 onClick={onStartSimulation}
                 disabled={loadingAction}
                 className="pill-button pill-critical"
-                style={{ fontSize: '0.76rem', padding: '0.4rem 0.85rem' }}
+                style={{ fontSize: '0.72rem', padding: '0.3rem 0.75rem' }}
               >
                 Trigger Hero Scenario
               </button>
             )}
           </div>
         </div>
+
+        {/* Priority Investigation Queue */}
+        <PriorityQueue
+          alerts={alerts}
+          onOpenInvestigation={onOpenInvestigation}
+          onInspectDevice={onSelectDevice}
+        />
+
+        {/* Activity Chart & Risk Distribution */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+            gap: '1.25rem',
+          }}
+        >
+          <ActivityChart
+            timeline={timeline}
+            isSimulationActive={isSimulationActive}
+          />
+          <RiskDistribution
+            devices={devices}
+            isSimulationActive={isSimulationActive}
+          />
+        </div>
       </div>
-
-      {/* KPI Cards Row */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '1.15rem',
-        }}
-      >
-        <MetricCard
-          title="Total Devices"
-          value={stats.total_devices || 42}
-          subtext="Monitored /24 endpoints"
-          icon={HardDrive}
-          variant="default"
-          badge="Nominal"
-        />
-
-        <MetricCard
-          title="Active Anomalies"
-          value={isSimulationActive ? 1 : (stats.active_anomalies || 0)}
-          subtext={isCritical ? "Threshold deviation detected" : "0 deviations exceeding baseline"}
-          icon={AlertTriangle}
-          variant={isCritical ? "warning" : "healthy"}
-          badge={isCritical ? "Alert" : "Clean"}
-        />
-
-        <MetricCard
-          title="Critical Alerts"
-          value={isSimulationActive ? 1 : (stats.critical_count || 0)}
-          subtext={isCritical ? "Student-Laptop (Risk 94/100)" : "No high-severity incidents"}
-          icon={ShieldAlert}
-          variant={isCritical ? "critical" : "healthy"}
-          badge={isCritical ? "Triage" : "Nominal"}
-        />
-
-        <MetricCard
-          title="Events Processed"
-          value={(stats.total_events || 7056).toLocaleString()}
-          subtext="Telemetry records evaluated"
-          icon={Cpu}
-          variant="default"
-        />
-      </div>
-
-      {/* Signature Visual Feature: Network Topology Geometry */}
-      <NetworkTopology
-        devices={devices}
-        isSimulationActive={isSimulationActive}
-        onSelectDevice={onSelectDevice}
-      />
-
-      {/* Priority Investigation Queue (Alerts) */}
-      <PriorityQueue
-        alerts={alerts}
-        onOpenInvestigation={onOpenInvestigation}
-        onInspectDevice={onSelectDevice}
-      />
-
-      {/* Activity Chart & Risk Distribution Grid */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-          gap: '1.25rem',
-        }}
-      >
-        <ActivityChart
-          timeline={timeline}
-          isSimulationActive={isSimulationActive}
-        />
-
-        <RiskDistribution
-          devices={devices}
-          isSimulationActive={isSimulationActive}
-        />
-      </div>
-
     </div>
   );
 };

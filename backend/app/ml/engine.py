@@ -61,6 +61,10 @@ class AnalysisResult:
     def to_anomaly_contract(self) -> dict[str, Any]:
         return build_anomaly_contract(self.device_id, self.detected_at, self.signals, self.risk)
 
+    def top_signals(self, n: int = 4):
+            from backend.app.ml.risk_engine import top_signals as _top_signals
+
+            return _top_signals(self.signals, n=n)
 
 class AnomalyEngine:
     def __init__(self, baselines: Mapping[str, DeviceBaseline], detector: IsolationForestDetector,

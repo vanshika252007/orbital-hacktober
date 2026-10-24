@@ -110,3 +110,21 @@ def build_anomaly_contract(device_id: str, detected_at: str, signals: Sequence[M
         "detected_at": detected_at,
         "signals": [dict(s) for s in signals],
     }
+
+from backend.app.ml.rules import SEVERITY_RANK
+
+DEFAULT_EVIDENCE_COUNT = 4
+
+
+def top_signals(signals, n=DEFAULT_EVIDENCE_COUNT):
+    """Returns top N signals sorted by severity (CRITICAL > HIGH > MEDIUM > LOW),
+
+    then by deviation_factor descending.
+    """
+    ranked = sorted(
+        signals,
+        key=lambda s: (SEVERITY_RANK[s["severity"]], s["deviation_factor"]),
+        reverse=True,
+    )
+    return [dict(s) for s in ranked[:n]]
+

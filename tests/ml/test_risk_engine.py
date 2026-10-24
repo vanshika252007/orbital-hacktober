@@ -67,3 +67,50 @@ def test_contract_shape():
     r = compute_risk([sig("traffic_spike", "CRITICAL", 86.0)], 0.9)
     c = build_anomaly_contract("1.2.3.4", "2026-10-24T03:17:00Z", [sig("traffic_spike", "CRITICAL", 86.0)], r)
     assert list(c) == ["device_id", "anomaly", "risk_score", "severity", "detected_at", "signals"]
+
+from backend.app.ml.risk_engine import top_signals
+from backend.app.simulation.data_generator import build_hero_anomaly_record
+
+
+def test_top_signals_sorting_and_cap():
+    signals = [
+        {"type": "unusual_hours", "severity": "MEDIUM", "deviation_factor": 1.0},
+        {"type": "traffic_spike", "severity": "HIGH", "deviation_factor": 86.0},
+        {
+            "type": "failed_connection_burst",
+            "severity": "CRITICAL",
+            "deviation_factor": 170.0,
+        },
+        {
+            "type": "destination_explosion",
+            "severity": "HIGH",
+            "deviation_factor": 9.4,
+        },
+        {"type": "connection_burst", "severity": "LOW", "deviation_factor": 13.4},
+    ]
+
+    top_4 = top_signals(signals, n=4)
+
+    assert len(top_4) == 4
+    # Highest priority is CRITICAL
+    assert top_4[0]["type"] == "failed_connection_burst"
+    # Next highest are HIGH, ordered by higher deviation factor
+    assert top_4[1]["type"] == "traffic_spike"
+    assert top_4[2]["type"] == "destination_explosion"
+    # Next is MEDIUM
+    assert top_4[3]["type"] == "unusual_hours"
+
+
+def test_top_signals_hero_ranking(engine):
+    hero_record = build_hero_anomaly_record()
+    res = engine.analyze("192.168.1.23", hero_record)
+
+    top_4 = res.top_signals(n=4)
+    assert len(top_4) == 4
+    types = [s["type"] for s in top_4]
+    assert types == [
+        "failed_connection_burst",
+        "traffic_spike",
+        "destination_explosion",
+        "unusual_hours",
+    ]

@@ -1,0 +1,48 @@
+{
+  "type": "object",
+  "required": [
+    "alert_id",
+    "device_id",
+    "summary",
+    "observed_evidence",
+    "possible_explanations",
+    "check_first",
+    "next_steps",
+    "confidence",
+    "generated_by"
+  ],
+  "properties": {
+    "alert_id": {"type": "string"},
+    "device_id": {"type": "string"},
+    "summary": {"type": "string"},
+    "observed_evidence": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "possible_explanations": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "check_first": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["priority", "action", "reason"],
+        "properties": {
+          "priority": {"type": "integer"},
+          "action": {"type": "string"},
+          "reason": {"type": "string"}
+        }
+      }
+    },
+    "next_steps": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "generated_by": {"type": "string"}
+  }
+}

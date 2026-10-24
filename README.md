@@ -62,6 +62,16 @@ uvicorn backend.app.main:app --reload --host 0.0.0.0 --port 8000
 - Alternative ReDoc: `http://localhost:8000/redoc`
 - Health check: `http://localhost:8000/api/health`
 
+### Running the Frontend UI (Teammate 3)
+```bash
+cd frontend
+npm install
+npm run dev
+```
+- Dashboard UI: `http://localhost:5173`
+- Pre-configured API proxy connects automatically to backend at `http://localhost:8000`
+- Zero-fail offline presentation mode with embedded contract fixtures
+
 ---
 
 ## 3. The 30-Second Demo Presentation Scenario

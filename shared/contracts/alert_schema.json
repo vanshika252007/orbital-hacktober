@@ -1,91 +1,45 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "type": "object",
-  "required": [
-    "id",
-    "device_id",
-    "device_name",
-    "risk_score",
-    "severity",
-    "status",
-    "detected_at",
-    "primary_reason",
-    "signals_count",
-    "signals"
-  ],
-  "properties": {
-    "id": {
-      "type": "string"
+  "id": "alert_001",
+  "device_id": "192.168.1.23",
+  "device_name": "Student-Laptop",
+  "risk_score": 94,
+  "severity": "CRITICAL",
+  "status": "OPEN",
+  "detected_at": "2026-10-24T03:17:00Z",
+  "primary_reason": "Extreme outbound traffic spike and high connection failure rate outside normal hours",
+  "signals_count": 4,
+  "signals": [
+    {
+      "type": "traffic_spike",
+      "severity": "HIGH",
+      "measured_value": 2202010,
+      "baseline_value": 25600,
+      "deviation_factor": 86.0,
+      "explanation": "Outbound traffic is 86.0x above baseline (2.1 MB vs 25 KB normal)"
     },
-    "device_id": {
-      "type": "string"
+    {
+      "type": "failed_connection_burst",
+      "severity": "CRITICAL",
+      "measured_value": 340,
+      "baseline_value": 2,
+      "deviation_factor": 170.0,
+      "explanation": "340 failed connection attempts vs 2 normal (170.0x baseline)"
     },
-    "device_name": {
-      "type": "string"
+    {
+      "type": "destination_explosion",
+      "severity": "HIGH",
+      "measured_value": 47,
+      "baseline_value": 5,
+      "deviation_factor": 9.4,
+      "explanation": "Contacted 47 unique destinations vs 5 normal (9.4x baseline)"
     },
-    "risk_score": {
-      "type": "number",
-      "minimum": 0,
-      "maximum": 100
-    },
-    "severity": {
-      "type": "string",
-      "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
-    },
-    "status": {
-      "type": "string",
-      "enum": ["OPEN", "INVESTIGATING", "RESOLVED", "FALSE_POSITIVE"]
-    },
-    "detected_at": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "primary_reason": {
-      "type": "string"
-    },
-    "signals_count": {
-      "type": "integer",
-      "minimum": 0
-    },
-    "signals": {
-      "type": "array",
-      "items": {
-        "$ref": "#/$defs/signal"
-      }
+    {
+      "type": "unusual_hours",
+      "severity": "HIGH",
+      "measured_value": 3,
+      "baseline_value": 8,
+      "deviation_factor": 5,
+      "explanation": "Activity at 03:17 is outside this device's normal active hours (08:00-22:00)"
     }
-  },
-  "$defs": {
-    "signal": {
-      "type": "object",
-      "required": [
-        "type",
-        "severity",
-        "measured_value",
-        "baseline_value",
-        "deviation_factor",
-        "explanation"
-      ],
-      "properties": {
-        "type": {
-          "type": "string"
-        },
-        "severity": {
-          "type": "string",
-          "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
-        },
-        "measured_value": {
-          "type": "number"
-        },
-        "baseline_value": {
-          "type": "number"
-        },
-        "deviation_factor": {
-          "type": "number"
-        },
-        "explanation": {
-          "type": "string"
-        }
-      }
-    }
-  }
+  ]
 }

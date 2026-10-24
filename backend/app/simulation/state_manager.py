@@ -363,15 +363,10 @@ def _generate_and_cache_investigation(
             pass
 
     # Fallback: produce a static investigation from the hero signals
-    _save_static_investigation(db, alert_id, device_id, signals)
+    _save_static_investigation(db, alert_id, device_id)
 
 
-def _save_static_investigation(
-    db: Session,
-    alert_id: str,
-    device_id: str,
-    signals: list,
-) -> None:
+def _save_static_investigation(db: Session, alert_id: str, device_id: str) -> None:
     static = {
         "summary": (
             "Device Student-Laptop exhibits suspicious network behaviors starting at 03:17 AM. "
@@ -379,11 +374,10 @@ def _save_static_investigation(
             "and contact with a large number of previously unseen destinations."
         ),
         "observed_evidence": [
-            signal["explanation"]
-            for signal in signals
-            if isinstance(signal, dict) and signal.get("explanation")
-        ] or [
-            "No detailed anomaly signals were provided; inspect the underlying telemetry."
+            "Outbound traffic escalated to 2.1 MB (86.0x higher than baseline 25 KB)",
+            "47 unique destination IPs contacted vs 5 expected",
+            "340 connection attempts failed (potential port scan or dead C2 infrastructure)",
+            "Activity observed at 03:17 AM (normal active hours: 08:00-22:00)",
         ],
         "possible_explanations": [
             "Internal host performing automated network reconnaissance/scanning",
@@ -394,7 +388,7 @@ def _save_static_investigation(
             {"priority": 1, "action": "Review DNS requests", "reason": "Identify if destination IPs correlate with newly registered domain queries or DGA patterns."},
             {"priority": 2, "action": "Inspect outbound connections", "reason": "Identify active network sockets and target destination ports."},
             {"priority": 3, "action": "Check running processes on host", "reason": "Pinpoint local executable responsible for background traffic at 03:17 AM."},
-            {"priority": 4, "action": "Verify device ownership", "reason": "Confirm if Student-Laptop was physically active or remotely accessed at night."},
+            {"priority": 4, "action": "Verify device ownership and location", "reason": "Confirm if Student-Laptop was physically active or remotely accessed at night."},
             {"priority": 5, "action": "Consider network isolation if traffic continues", "reason": "Prevent potential data staging or lateral movement while investigating."},
         ],
         "next_steps": [

@@ -1,3 +1,4 @@
+
 {
   "type": "object",
   "required": [
@@ -12,37 +13,65 @@
     "generated_by"
   ],
   "properties": {
-    "alert_id": {"type": "string"},
-    "device_id": {"type": "string"},
-    "summary": {"type": "string"},
+    "alert_id": {
+      "type": "string"
+    },
+    "device_id": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
     "observed_evidence": {
       "type": "array",
-      "items": {"type": "string"}
+      "items": {
+        "type": "string"
+      }
     },
     "possible_explanations": {
       "type": "array",
-      "items": {"type": "string"}
+      "items": {
+        "type": "string"
+      }
     },
     "check_first": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["priority", "action", "reason"],
+        "required": [
+          "priority",
+          "action",
+          "reason"
+        ],
         "properties": {
-          "priority": {"type": "integer"},
-          "action": {"type": "string"},
-          "reason": {"type": "string"}
+          "priority": {
+            "type": "integer"
+          },
+          "action": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
         }
       }
     },
     "next_steps": {
       "type": "array",
-      "items": {"type": "string"}
+      "items": {
+        "type": "string"
+      }
     },
     "confidence": {
       "type": "string",
-      "enum": ["low", "medium", "high"]
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
     },
-    "generated_by": {"type": "string"}
+    "generated_by": {
+      "type": "string"
+    }
   }
 }

@@ -1,0 +1,29 @@
+{
+  "id": "192.168.1.23",
+  "name": "Student-Laptop",
+  "type": "Workstation",
+  "ip": "192.168.1.23",
+  "mac": "00:1B:44:11:3A:B7",
+  "status": "critical",
+  "risk_score": 94.0,
+  "last_seen": "2026-10-24T03:18:00Z",
+  "baseline": {
+    "avg_bytes_sent": 25600,
+    "avg_bytes_received": 102400,
+    "avg_connections": 32,
+    "avg_unique_destinations": 5,
+    "avg_failed_connections": 2,
+    "avg_dns_requests": 18,
+    "active_hours_start": 8,
+    "active_hours_end": 22
+  },
+  "current_metrics": {
+    "bytes_sent": 2202010,
+    "bytes_received": 512000,
+    "connections": 430,
+    "unique_destinations": 47,
+    "failed_connections": 340,
+    "dns_requests": 180,
+    "activity_hour": 3
+  }
+}
